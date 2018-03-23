@@ -5,8 +5,7 @@ This module provides better audio support for your Framer projects. It uses [Web
 #### 1. [Framer API Audio Example](https://framer.cloud/VVtVs)
 A sample project with a bit of everything.
 
-
----
+![Example Preview](https://raw.githubusercontent.com/raulibanez/framer-audio/master/example.png)
 
 ## Including the Module
 To use this module, get the AudioAPI.coffee file from within the `/module` folder and place it within the `/modules` folder of your prototype. 
