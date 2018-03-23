@@ -27,6 +27,6 @@ clip = audio.load
 	name: "ClipFeel"
 	url: "https://s3-eu-west-1.amazonaws.com/freesounds/feelagain.mp3"
  
- clip.onPlaybackEnd ->
+ clip.onLoadEnd ->
 	clip.play()
 ```
