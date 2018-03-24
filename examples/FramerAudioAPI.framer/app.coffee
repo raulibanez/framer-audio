@@ -31,7 +31,8 @@ clone.onTap ->
 	clips.push clipC
 	
 stopAll.onTap ->
-	audio.stop()
+	for clip in clips
+		clip.stop()
 		
 slider = new SliderComponent
 	x: Align.center
