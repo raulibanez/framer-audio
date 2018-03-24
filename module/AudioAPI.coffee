@@ -52,7 +52,6 @@ class AudioAPI extends Framer.BaseClass
 		# Add this to the ObjectList arrayNext
 		ObjectList.push @
 
-
 	# Setup nodes to build chain
 	connect: ->
 
@@ -67,7 +66,7 @@ class AudioAPI extends Framer.BaseClass
 		@gainNode.gain.value = @options.volume
 		@source.loop=@loop
 
-	load: ->
+	load: =>
 
 		if BufferList[@options.url] is undefined
 
@@ -92,6 +91,12 @@ class AudioAPI extends Framer.BaseClass
 					# Setup chain
 					@connect()
 
+					# Flag control
+					@loaded = true
+					@loading = false
+					@emit "LoadEnd", @source
+
+					# Autoplay control
 					if @autoplay is true
 						@play()
 					)
@@ -100,11 +105,6 @@ class AudioAPI extends Framer.BaseClass
 	# 			@request.onreadystatechange = =>
 	# 				print XMLHttpRequest.DONE
 	# 				print @request.status
-
-			@request.addEventListener 'loadend' , (event) =>
-				@loaded = true
-				@loading = false
-				@emit "LoadEnd", @source
 
 			@request.send()
 
