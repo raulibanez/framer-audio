@@ -158,11 +158,14 @@ class AudioAPI extends Framer.BaseClass
 				# An audio source can only be played once
 				# A new AudioAPI has to be created
 
-				# We force autoplay
-				@options.autoplay = true
+				# We disable autoplay
+				@options.autoplay = false
 
 				# New AudioAPI with the same options
 				chain = new AudioAPI (@options)
+
+				# Start audio
+				chain.play(time, offset, duration)
 
 				# Return the object so it can treated in the program
 				return chain
