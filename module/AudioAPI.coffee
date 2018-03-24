@@ -1,4 +1,10 @@
-class AudioChain extends Framer.BaseClass
+AudioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+ObjectList = []
+
+BufferList = []
+
+class AudioAPI extends Framer.BaseClass
 
 	api: undefined
 
@@ -30,35 +36,31 @@ class AudioChain extends Framer.BaseClass
 
 	stopped: false
 
-
 	constructor: (@options={}) ->
 
-		@options.autoplay ?= true
+		@options.autoplay ?= false
 		@options.loop ?= false
 		@options.name ?= ""
 		@options.panner ?= false
-		@options.pan ?= 0
 		@options.speed ?= 1
 		@options.url ?= ""
 		@options.volume ?= 1
 
-		@api = @options.api
-
 		# Load URL into buffer
 		@load()
+
+		# Add this to the ObjectList arrayNext
+		ObjectList.push @
+
 
 	# Setup nodes to build chain
 	connect: ->
 
-		@gainNode = @api.context.createGain();
-
-		@pannerNode = @api.context.createPanner();
+		@gainNode = AudioContext.createGain();
 
 		@source.connect(@gainNode)
 
-		@pannerNode.connect(@gainNode)
-
-		@gainNode.connect(@api.context.destination)
+		@gainNode.connect(AudioContext.destination)
 
 		# Properties
 		@source.playbackRate.value = @options.speed
@@ -67,11 +69,11 @@ class AudioChain extends Framer.BaseClass
 
 	load: ->
 
-		if @api.buffers[@options.url] is undefined
+		if BufferList[@options.url] is undefined
 
 			@loading = true
 
-			@source = @api.context.createBufferSource()
+			@source = AudioContext.createBufferSource()
 			@request = new XMLHttpRequest()
 
 			@request.open("GET", @url, true)
@@ -79,13 +81,13 @@ class AudioChain extends Framer.BaseClass
 			@request.responseType = "arraybuffer"
 
 			@request.onload = =>
-				@api.context.decodeAudioData(@request.response,((buffer) =>
+				AudioContext.decodeAudioData(@request.response,((buffer) =>
 
 					#  Actual data stream
 					@source.buffer = buffer
 
-					# Adding the buffer to the API for later reuse
-					@api.addBuffer(@options.url, @source.buffer)
+					# We keep the buffers in an array for reuse
+					BufferList[@options.url] = @source.buffer
 
 					# Setup chain
 					@connect()
@@ -95,9 +97,9 @@ class AudioChain extends Framer.BaseClass
 					)
 				,((e) -> print "Error with decoding audio data" + e.err))
 
-# 			@request.onreadystatechange = =>
-# 				print XMLHttpRequest.DONE
-# 				print @request.status
+	# 			@request.onreadystatechange = =>
+	# 				print XMLHttpRequest.DONE
+	# 				print @request.status
 
 			@request.addEventListener 'loadend' , (event) =>
 				@loaded = true
@@ -108,8 +110,8 @@ class AudioChain extends Framer.BaseClass
 
 		else
 
-			@source = @api.context.createBufferSource()
-			@source.buffer = @api.buffers[@options.url]
+			@source = AudioContext.createBufferSource()
+			@source.buffer = BufferList[@options.url]
 			@connect()
 			if @autoplay is true
 				@play()
@@ -125,14 +127,14 @@ class AudioChain extends Framer.BaseClass
 		if @paused is true
 
 			@options.autoplay = false
-			chain = new AudioChain (@options)
-			chain.play(@api.context.currentTime, @playedOffset+(@pausedWhen-@playedWhen), @playedDuration-(@pausedWhen-@playedWhen))
+			chain = new AudioAPI (@options)
+			chain.play(AudioContext.currentTime, @playedOffset+(@pausedWhen-@playedWhen), @playedDuration-(@pausedWhen-@playedWhen))
 
 			return chain
 
 		else
 
-			time ?= @api.context.currentTime
+			time ?= AudioContext.currentTime
 			offset ?= 0
 			duration ?= @source.buffer.duration
 
@@ -154,13 +156,13 @@ class AudioChain extends Framer.BaseClass
 			else
 
 				# An audio source can only be played once
-				# A new AudioChain has to be created
+				# A new AudioAPI has to be created
 
 				# We force autoplay
 				@options.autoplay = true
 
-				# New Chain with the same options
-				chain = new AudioChain (@options)
+				# New AudioAPI with the same options
+				chain = new AudioAPI (@options)
 
 				# Return the object so it can treated in the program
 				return chain
@@ -177,8 +179,8 @@ class AudioChain extends Framer.BaseClass
 
 	clone: =>
 
-		# New Chain with the same options
-		chain = new AudioChain (@options)
+		# New AudioAPI with the same options
+		chain = new AudioAPI (@options)
 
 		# Return the object so it can treated in the program
 		return chain
@@ -191,13 +193,13 @@ class AudioChain extends Framer.BaseClass
 		duration ?= chain.source.duration
 
 		# Fade
-		@gainNode.gain.setValueAtTime(@volume, @api.context.currentTime);
-		@gainNode.gain.linearRampToValueAtTime(0, @api.context.currentTime+3);
-		@stop(@api.context.currentTime+3)
+		@gainNode.gain.setValueAtTime(@volume, AudioContext.currentTime);
+		@gainNode.gain.linearRampToValueAtTime(0, AudioContext.currentTime+3);
+		@stop(AudioContext.currentTime+3)
 		# We capture the object back for those cases the clip has to be "reloaded"
 		chain = chain.play(time, offset, duration)
-		chain.gainNode.gain.setValueAtTime(0, @api.context.currentTime);
-		chain.gainNode.gain.linearRampToValueAtTime(chain.volume, @api.context.currentTime+3);
+		chain.gainNode.gain.setValueAtTime(0, AudioContext.currentTime);
+		chain.gainNode.gain.linearRampToValueAtTime(chain.volume, AudioContext.currentTime+3);
 
 		return chain
 
@@ -207,11 +209,11 @@ class AudioChain extends Framer.BaseClass
 
 			@stop()
 			@paused=true
-			@pausedWhen=@api.context.currentTime
+			@pausedWhen=AudioContext.currentTime
 
 	fadeOut: (time, duration) ->
 
-		time ?= @api.context.currentTime
+		time ?= AudioContext.currentTime
 		duration ?= 3
 
 		@gainNode.gain.setValueAtTime(@volume, time);
@@ -220,7 +222,7 @@ class AudioChain extends Framer.BaseClass
 
 	fadeIn: (time, duration) ->
 
-		time ?= @api.context.currentTime
+		time ?= AudioContext.currentTime
 		duration ?= 3
 
 		@gainNode.gain.setValueAtTime(0, time);
@@ -277,63 +279,18 @@ class AudioChain extends Framer.BaseClass
 			if @gainNode isnt undefined
 				@gainNode.gain.value = @options.volume
 
-
-class AudioAPI extends Framer.BaseClass
-
-	context: undefined
-
-	buffers: []
-
-	chains: []
-
-	constructor: (@options={}) ->
-
-		super @options
-
-		# Context creation
-		@context = new (window.AudioContext || window.webkitAudioContext)();
-
-	@define 'volume',
-		get: ->
-			@options.volume
-		set: (value) ->
-			@options.volume = value
+	# Old AudioAPI code from here
 
 	@define 'currentTime',
 		get: ->
-			@context.currentTime
+			AudioContext.currentTime
 
-	addBuffer: (url, buffer, chain) =>
+	stopAll: ->
 
-		@buffers[url] = buffer
+		for obj in ObjectList
 
-	play: (options={}) ->
+			obj.stop()
 
-		# We include self (this) to be used withing AudioChain
-		options.api = this
-
-		# Every time we call "play" a new chain has to be added
-		chain = new AudioChain (options)
-
-	load: (options={}) ->
-
-		# Disabling autostart
-		options.autoplay = false
-
-		# We include self (this) to be used withing AudioChain
-		options.api = this
-
-		# AudioChain will contain the clip
-		chain = new AudioChain (options)
-
-		return chain
-
-	stop: ->
-
-		for chain in @chains
-
-			chain.stop()
-
-		@chains = []
+		ObjectList = []
 
 module.exports = AudioAPI

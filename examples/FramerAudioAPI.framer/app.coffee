@@ -1,38 +1,30 @@
 AudioAPI = require "AudioAPI"
 
-audio = new AudioAPI
-
-clipA = audio.load
+clipA = new AudioAPI
 	name: "ClipA"
 	url: "https://s3-eu-west-1.amazonaws.com/freesounds/feelagain.mp3"
 	
-clipB = audio.load
+clipB = new AudioAPI
 	name: "ClipB"
 	url: "https://s3-eu-west-1.amazonaws.com/freesounds/where.mp3"
 
 currentClip = clipA
 
-clips = []
-
 play.onTap ->
 	currentClip = clipA.play()
-	clips.push currentClip
 	
 advance.onTap ->
 	if currentClip.name == "ClipA"
 		currentClip = currentClip.fadeTo(clipB)
 	else
 		currentClip = currentClip.fadeTo(clipA)
-	clips.push currentClip
 	
 clone.onTap ->
 	clipC = clipA.clone()
 	clipC.play()
-	clips.push clipC
 	
 stopAll.onTap ->
-	for clip in clips
-		clip.stop()
+	clipA.stopAll()
 		
 slider = new SliderComponent
 	x: Align.center
@@ -54,17 +46,10 @@ fadeOut.onTap ->
 fadeIn.onTap ->
 	currentClip = currentClip.fadeIn()
 	clips.push currentClip
-	
 
 # Events
 clipA.onLoadEnd ->
 	print "#{clipA.name} loaded."
 	
-clipA.onPlaybackEnd ->
-	print "#{clipA.name} ended."
-	
 clipB.onLoadEnd ->
 	print "#{clipB.name} loaded."
-	
-clipB.onPlaybackEnd ->
-	print "#{clipB.name} ended."
