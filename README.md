@@ -21,9 +21,7 @@ This would be a very basic example. Remember that the clip must be loaded before
 ```javascript
 AudioAPI = require "AudioAPI"
 
-audio = new AudioAPI
-
-clip = audio.load
+clip = new AudioAPI
 	name: "ClipFeel"
 	url: "https://s3-eu-west-1.amazonaws.com/freesounds/feelagain.mp3"
  
