@@ -7,6 +7,9 @@ A sample project with a bit of everything.
 
 ![Example Preview](https://raw.githubusercontent.com/raulibanez/framer-audio/master/example.png)
 
+#### 2. [Accurate Timing](https://framer.cloud/GNAtb)
+In this project you can learn about accurate timing. The property ```curentTime``` allows you to schedule audio playback with high precission. This example plays a simple beat at a given tempo. No fancy UI, just pay attention to the code.
+
 ## Including the Module
 To use this module, get the AudioAPI.coffee file from within the `/module` folder and place it within the `/modules` folder of your prototype. 
 
