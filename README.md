@@ -2,7 +2,7 @@
 This module provides better audio support for your Framer projects. It uses [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API) instead the default [HTML5 Audio element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio). If you need **accurate timing** for your audio, **gapless loops** or **beautifull fades**, this is your module! Future additions will allow you to use 3D panner, waveforms and more. 
 
 ## Example
-#### 1. [Framer API Audio Example](https://framer.cloud/VVtVs)
+#### 1. [Framer API Audio Example](https://framer.cloud/MweHh)
 A sample project with a bit of everything.
 
 ![Example Preview](https://raw.githubusercontent.com/raulibanez/framer-audio/master/example.png)
