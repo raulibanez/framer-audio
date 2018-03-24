@@ -30,3 +30,23 @@ clip = audio.load
 clip.onLoadEnd ->
 	clip.play()
 ```
+
+## Known Problems
+
+#### 'TypeError: null is not an object'
+
+You will see this error often but it's not an actual problem. Every time you see it, you just have to **reload (CMD+R)** to eliminate it. This issue is caused by Framer and how it manages the prototype preview. Not a big deal.
+
+![TypeError: null is not an object](https://raw.githubusercontent.com/raulibanez/framer-audio/master/error.png)
+
+#### Sound is not playing
+
+Web applications and hosting providers usually protect their resources (images, sounds, ...) to be used only when the access is requested from the same domain where they are hosted or external approved domains. This is controlled by a mechanism called [CORS](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing).
+
+Having said that, there are free CORS proxies which will allow you to avoid this security mechanism. These proxies usually have limitations (like 2MB maxsize limit). Please find below an example of how I use a CORS proxy (you have to add the URL string before the actual URL with the sound clip).
+
+```
+clip = audio.load
+	name: "ClipFeel"
+	url: "https://cors-anywhere.herokuapp.com/www.orangefreesounds.com/wp-content/uploads/2018/03/Meditation-bell-sound.mp3?_=1"
+```
