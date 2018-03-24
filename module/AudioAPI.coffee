@@ -279,8 +279,6 @@ class AudioAPI extends Framer.BaseClass
 			if @gainNode isnt undefined
 				@gainNode.gain.value = @options.volume
 
-	# Old AudioAPI code from here
-
 	@define 'currentTime',
 		get: ->
 			AudioContext.currentTime
