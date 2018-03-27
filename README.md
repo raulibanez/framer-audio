@@ -1,5 +1,5 @@
 # Framer Web Audio API Module
-This module provides better audio support for your Framer projects. It uses [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API) instead the default [HTML5 Audio element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio). If you need **accurate timing** for your audio, **gapless loops** or **beautifull fades**, this is your module! Future additions will allow you to use 3D panner, waveforms and more. 
+This module provides better audio support for your Framer projects. It uses [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API) instead the default [HTML5 Audio element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio). If you need **accurate timing** for your audio, **gapless loops** or **beautifull fades**, this is your module! Future additions will allow you to use waveforms, filters and much more.
 
 ## Example
 #### 1. [Framer API Audio Example](https://framer.cloud/MweHh)
@@ -10,8 +10,11 @@ A sample project with a bit of everything.
 #### 2. [Accurate Timing](https://framer.cloud/GNAtb)
 In this project you can learn about accurate timing. The property ```curentTime``` allows you to schedule audio playback with high precission. This example plays a simple beat at a given tempo. No fancy UI, just pay attention to the code.
 
+#### 3. [Panning](https://framer.cloud/IWLlb)
+A very basic example with panning. You can move the speaker freely in the prototype and the audio will be panned accordingly. I look forward to all the great things you can do.
+
 ## Including the Module
-To use this module, get the AudioAPI.coffee file from within the `/module` folder and place it within the `/modules` folder of your prototype. 
+To use this module, get the AudioAPI.coffee file from within the `/module` folder and place it within the `/modules` folder of your prototype.
 
 ```javascript
 AudioAPI = require "AudioAPI"
@@ -27,7 +30,7 @@ AudioAPI = require "AudioAPI"
 clip = new AudioAPI
 	name: "ClipFeel"
 	url: "https://s3-eu-west-1.amazonaws.com/freesounds/feelagain.mp3"
- 
+
 clip.onLoadEnd ->
 	clip.play()
 ```
