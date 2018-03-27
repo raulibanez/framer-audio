@@ -39,12 +39,22 @@ class AudioAPI extends Framer.BaseClass
 	constructor: (@options={}) ->
 
 		@options.autoplay ?= false
-		@options.loop ?= false
+		@options.looping ?= false
 		@options.name ?= ""
 		@options.panner ?= false
+		@options.maxDistance ?= 1000
 		@options.speed ?= 1
 		@options.url ?= ""
 		@options.volume ?= 1
+
+		super @options
+
+		# Node creation
+		@source = AudioContext.createBufferSource()
+		@gainNode = AudioContext.createGain();
+		if @panner is true
+			@pannerNode = AudioContext.createPanner()
+			@setPannerProperties()
 
 		# Load URL into buffer
 		@load()
@@ -52,19 +62,58 @@ class AudioAPI extends Framer.BaseClass
 		# Add this to the ObjectList arrayNext
 		ObjectList.push @
 
+	# Panner Default properties
+	setPannerProperties: ->
+
+		# Panner default properties
+		@pannerNode.panningModel = 'HRTF'
+		@pannerNode.distanceModel = 'linear'
+		@pannerNode.refDistance = 1
+		@pannerNode.maxDistance = @options.maxDistance
+		@pannerNode.rolloffFactor = 1
+		@pannerNode.coneInnerAngle = 360
+		@pannerNode.coneOuterAngle = 0
+		@pannerNode.coneOuterGain = 0
+
+		# Panner default location (0, 0, 0)
+		@pannerNode.setPosition(0, 0, 0)
+		@pannerNode.setOrientation(0, 0, 0)
+
+		# Listener default location (0, 0, 0)
+		AudioContext.listener.setPosition(0, 0, 0)
+		AudioContext.listener.setOrientation(0, 1, 0, 0, 0, 1)
+
+	# Panner position
+	setPannerPosition: (xPos, yPos, zPos) =>
+
+		@pannerNode.setPosition(xPos, yPos, zPos)
+
+	# Listener position
+	setListenerPosition: (xPos, yPos, zPos) =>
+
+		AudioContext.listener.setPosition(xPos, yPos, zPos)
+
 	# Setup nodes to build chain
 	connect: ->
 
-		@gainNode = AudioContext.createGain();
+		if @panner is false
 
-		@source.connect(@gainNode)
+			@source.connect(@gainNode)
 
-		@gainNode.connect(AudioContext.destination)
+			@gainNode.connect(AudioContext.destination)
+
+		else
+
+			@source.connect(@pannerNode)
+
+			@pannerNode.connect(@gainNode)
+
+			@gainNode.connect(AudioContext.destination)
 
 		# Properties
 		@source.playbackRate.value = @options.speed
 		@gainNode.gain.value = @options.volume
-		@source.loop=@loop
+		@source.loop=@looping
 
 	load: =>
 
@@ -72,7 +121,6 @@ class AudioAPI extends Framer.BaseClass
 
 			@loading = true
 
-			@source = AudioContext.createBufferSource()
 			@request = new XMLHttpRequest()
 
 			@request.open("GET", @url, true)
@@ -110,7 +158,6 @@ class AudioAPI extends Framer.BaseClass
 
 		else
 
-			@source = AudioContext.createBufferSource()
 			@source.buffer = BufferList[@options.url]
 			@connect()
 			if @autoplay is true
@@ -242,11 +289,14 @@ class AudioAPI extends Framer.BaseClass
 		get: ->
 			@options.autoplay
 
-	@define 'loop',
+	@define 'looping',
 		get: ->
-			@options.loop
+			@options.looping
 		set: (value) ->
-			@options.loop = value
+			@options.looping = value
+
+			if @source isnt undefined
+				@source.loop=@options.looping
 
 	@define 'name',
 		get: ->
@@ -259,6 +309,15 @@ class AudioAPI extends Framer.BaseClass
 			@options.panner
 		set: (value) ->
 			@options.panner = value
+
+	@define 'maxDistance',
+		get: ->
+			@options.maxDistance
+		set: (value) ->
+			@options.maxDistance = value
+
+			if @pannerNode isnt undefined
+				@pannerNode.maxDistance = @options.maxDistance
 
 	@define 'speed',
 		get: ->
