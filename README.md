@@ -3,7 +3,7 @@ This module provides better audio support for your Framer projects. It uses [Web
 
 ## Example
 #### 1. [Framer API Audio Example](https://framer.cloud/MweHh)
-A sample project with a bit of everything.
+A sample project with basic controls.
 
 ![Example Preview](https://raw.githubusercontent.com/raulibanez/framer-audio/master/example.png)
 
